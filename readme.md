@@ -28,13 +28,25 @@ Aşağıda istenilen sonuçlara ulaşabilmek için gerekli SQL sorgularını yaz
 MIN-MAX, COUNT-AVG-SUM, GROUP BY, JOINS (INNER, OUTER, LEFT, RIGHT
 	#ilk 3 soruyu join kullanmadan yazın.
 	1) Öğrencinin adını, soyadını ve kitap aldığı tarihleri listeleyin.
-	
-
+        SELECT o.ograd, o.ogrsoyad, i.atarih FROM ogrenci AS o, islem AS i WHERE o.ogrno=i.ogrno
 	
 	2) Fıkra ve hikaye türündeki kitapların adını ve türünü listeleyin.
-	
-	
+        
+        SELECT * FROM kitap 
+        WHERE turno IN (
+            SELECT turno FROM tur WHERE turadi IN ('fıkra', 'hikaye')
+        )
+
 	3) 10B veya 10C sınıfındaki öğrencilerin numarasını, adını, soyadını ve okuduğu kitapları listeleyin.
+        SELECT o.ogrno, o.ograd, o.ogrsoyad, k.kitapadi
+        FROM
+            ogrenci AS o,
+            islem AS i,
+            kitap AS k
+        WHERE
+            o.ogrno=i.ogrno AND
+            i.kitapno = k.kitapno AND
+            o.sinif IN ('10B', '10C')
 	
 	#join ile yazın
 	4) Öğrencinin adını, soyadını ve kitap aldığı tarihleri listeleyin.
@@ -148,6 +160,16 @@ MIN-MAX, COUNT-AVG-SUM, GROUP BY, JOINS (INNER, OUTER, LEFT, RIGHT
         SELECT sinif, cinsiyet, COUNT(ogrno) FROM ogrenci GROUP BY sinif, cinsiyet
 	
 	28) Her öğrencinin adını, soyadını ve okuduğu toplam sayfa sayısını büyükten küçüğe doğru listeleyiniz.
-	
+        SELECT o.ograd, o.ogrsoyad, SUM(k.sayfasayisi)
+        FROM ogrenci AS o
+        INNER JOIN islem AS i ON o.ogrno= i.ogrno
+        INNER JOIN kitap AS k ON i.kitapno=k.kitapno
+        GROUP BY o.ogrno, o.ograd, o.ogrsoyad
+        ORDER BY SUM(k.sayfasayisi) DESC
 	
 	29) Her öğrencinin okuduğu kitap sayısını getiriniz.
+        SELECT o.ograd, o.ogrsoyad, COUNT(k.kitapno)
+        FROM ogrenci AS o
+        INNER JOIN islem AS i ON o.ogrno= i.ogrno
+        INNER JOIN kitap AS k ON i.kitapno=k.kitapno
+        GROUP BY o.ogrno, o.ograd, o.ogrsoyad
